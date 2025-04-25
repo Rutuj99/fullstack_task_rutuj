@@ -1,3 +1,3 @@
 # fullstack_task_rutuj
 
-[text](https://fullstack-task-rutuj-qe1r.vercel.app/)
+[Deployed Link](https://fullstack-task-rutuj-qe1r.vercel.app/)
