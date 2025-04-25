@@ -47,7 +47,6 @@ let mongoCollection;
 const mqttClient = mqtt.connect(process.env.MQTT_BROKER);
 
 
-const REDIS_KEY = 'FULLSTACK_TASK_JOHN';
 
 async function init() {
   try {
@@ -91,7 +90,7 @@ async function addTask(task) {
   try {
    
     let tasks = [];
-    const tasksStr = await redisClient.get(REDIS_KEY);
+    const tasksStr = await redisClient.get(process.env.REDIS_KEY);
     if (tasksStr) {
       tasks = JSON.parse(tasksStr);
     }
@@ -102,11 +101,11 @@ async function addTask(task) {
     // If tasks exceed 50, move to MongoDB and clear Redis
     if (tasks.length > 50) {
       await mongoCollection.insertMany(tasks);
-      await redisClient.del(REDIS_KEY);
+      await redisClient.del(process.env.REDIS_KEY);
       tasks = [];
     } else {
      
-      await redisClient.set(REDIS_KEY, JSON.stringify(tasks));
+      await redisClient.set(process.env.REDIS_KEY, JSON.stringify(tasks));
     }
   } catch (error) {
     console.error('Error adding task:', error);
@@ -118,7 +117,7 @@ async function addTask(task) {
 app.get('/fetchAllTasks', async (req, res) => {
   try {
    
-    const redisTasksStr = await redisClient.get(REDIS_KEY);
+    const redisTasksStr = await redisClient.get(process.env.REDIS_KEY);
     const redisTasks = redisTasksStr ? JSON.parse(redisTasksStr) : [];
 
     // Get tasks 
