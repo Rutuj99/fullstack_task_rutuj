@@ -60,7 +60,7 @@ async function init() {
       throw new Error('Failed to connect to MongoDB after multiple retries');
     }
     
-    mongoCollection = mongoClient.db(process.env.MONGODB_DB || 'SupaBase').collection(process.env.MONGODB_COLLECTION || 'tasks');
+    mongoCollection = mongoClient.db(process.env.MONGODB_DB).collection(process.env.MONGODB_COLLECTION);
 
     
     mqttClient.subscribe(process.env.MQTT_TOPIC_ADD, (err) => {
