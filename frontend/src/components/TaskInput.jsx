@@ -4,7 +4,7 @@ import { Input, Button, Flex, FormControl } from '@chakra-ui/react'
 
 const TaskInput = () => {
   const [task, setTask] = useState('')
-  // const [client] = useState(() => mqtt.connect('ws://broker.hivemq.com:8000/mqtt'))
+  const [client] = useState(() => mqtt.connect('ws://broker.hivemq.com:8000/mqtt'))
 
   const handleSubmit = (e) => {
     e.preventDefault()
