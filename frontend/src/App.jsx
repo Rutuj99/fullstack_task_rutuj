@@ -1,41 +1,24 @@
-import { useState, useEffect } from 'react';
-import axios from 'axios';
-import { Box, Container, Heading, Flex } from '@chakra-ui/react';
-import TaskList from './components/TaskList';
-import TaskInput from './components/TaskInput';
-import { connectSocket, getSocket } from './socket';
+import { useState, useEffect } from 'react'
+import axios from 'axios'
+import { Box, Container, Heading, Flex, Image } from '@chakra-ui/react'
+import TaskList from './components/TaskList'
+import TaskInput from './components/TaskInput'
 
 function App() {
-  const [tasks, setTasks] = useState([]);
+  const [tasks, setTasks] = useState([])
 
   useEffect(() => {
-    fetchTasks();
-    connectSocket();
-
-    const socket = getSocket();
-
-    socket.onmessage = (event) => {
-      const message = JSON.parse(event.data);
-
-      // Assuming message format: { type: 'new-task', task: { ... } }
-      if (message.type === 'new-task') {
-        setTasks((prevTasks) => [...prevTasks, message.task]);
-      }
-    };
-
-    return () => {
-      socket.close();
-    };
-  }, []);
+    fetchTasks()
+  }, [])
 
   const fetchTasks = async () => {
     try {
-      const response = await axios.get('/api/fetchAllTasks');
-      setTasks(response.data);
+      const response = await axios.get('http://localhost:3000/get-data')
+      setTasks(response.data)
     } catch (error) {
-      console.error('Error fetching tasks:', error);
+      console.error('Error fetching tasks:', error)
     }
-  };
+  }
 
   return (
     <Box minH="100vh" bg="gray.50" py={8}>
@@ -58,7 +41,7 @@ function App() {
         </Box>
       </Container>
     </Box>
-  );
+  )
 }
 
-export default App;
+export default App
