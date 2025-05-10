@@ -1,22 +1,41 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import mqtt from 'mqtt'
-import { Input, Button, Flex, FormControl } from '@chakra-ui/react'
+import { Input, Button, Flex } from '@chakra-ui/react'
 
 const TaskInput = () => {
   const [task, setTask] = useState('')
-  const [client] = useState(() => mqtt.connect('ws://broker.hivemq.com:8000/mqtt'))
+  const [client, setClient] = useState(null)
+  
+  useEffect(() => {
+    // Create MQTT client
+    const mqttClient = mqtt.connect('ws://broker.hivemq.com:8000/mqtt')
+    setClient(mqttClient)
+    
+    // Clean up on unmount
+    return () => {
+      if (mqttClient) {
+        mqttClient.end()
+      }
+    }
+  }, [])
 
   const handleSubmit = (e) => {
     e.preventDefault()
-    if (!task.trim()) return
+    if (!task.trim() || !client) return
 
     const taskData = {
       text: task,
       timestamp: new Date().toISOString()
     }
 
-    client.publish('/add', JSON.stringify(taskData))
-    setTask('')
+    // Only publish if client is connected
+    if (client.connected) {
+      client.publish('/add', JSON.stringify(taskData))
+      console.log('Task published:', taskData)
+      setTask('')
+    } else {
+      console.error('MQTT client not connected')
+    }
   }
 
   return (

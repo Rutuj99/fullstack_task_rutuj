@@ -1,19 +1,50 @@
 import { useState, useEffect } from 'react'
 import axios from 'axios'
-import { Box, Container, Heading, Flex, Image } from '@chakra-ui/react'
+import { Box, Container, Heading, Flex } from '@chakra-ui/react'
+import mqtt from 'mqtt'
 import TaskList from './components/TaskList'
 import TaskInput from './components/TaskInput'
 
 function App() {
   const [tasks, setTasks] = useState([])
+  const [mqttClient, setMqttClient] = useState(null)
 
   useEffect(() => {
     fetchTasks()
+    
+    // Connect to MQTT broker
+    const client = mqtt.connect('ws://broker.hivemq.com:8000/mqtt')
+    setMqttClient(client)
+    
+    // Subscribe to the topic when a new task is added
+    client.on('connect', () => {
+      console.log('Connected to MQTT broker')
+      client.subscribe('/add')
+    })
+    
+    // Handle incoming messages
+    client.on('message', (topic, message) => {
+      if (topic === '/add') {
+        try {
+          const newTask = JSON.parse(message.toString())
+          setTasks(prevTasks => [newTask, ...prevTasks])
+        } catch (error) {
+          console.error('Error parsing MQTT message:', error)
+        }
+      }
+    })
+    
+    // Clean up the MQTT connection when component unmounts
+    return () => {
+      if (client) {
+        client.end()
+      }
+    }
   }, [])
 
   const fetchTasks = async () => {
     try {
-      const response = await axios.get('http://localhost:3000/get-data')
+      const response = await axios.get('http://localhost:3000/fetchAllTasks')
       setTasks(response.data)
     } catch (error) {
       console.error('Error fetching tasks:', error)

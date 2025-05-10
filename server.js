@@ -96,7 +96,7 @@ async function addTask(task) {
     }
 
 
-    tasks.push(task);
+    tasks.unshift(task);
 
     // If tasks exceed 50, move to MongoDB and clear Redis
     if (tasks.length > 50) {
@@ -123,8 +123,8 @@ app.get('/fetchAllTasks', async (req, res) => {
     // Get tasks 
     const mongoTasks = await mongoCollection.find({}).toArray();
 
-    // Combine 
-    const allTasks = [...mongoTasks, ...redisTasks];
+    // Combine - Redis tasks first (newer tasks) followed by MongoDB tasks
+    const allTasks = [...redisTasks, ...mongoTasks];
 
     res.json(allTasks);
   } catch (error) {
