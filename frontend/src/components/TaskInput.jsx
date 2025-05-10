@@ -7,11 +7,10 @@ const TaskInput = () => {
   const [client, setClient] = useState(null)
   
   useEffect(() => {
-    // Create MQTT client
+   
     const mqttClient = mqtt.connect('ws://broker.hivemq.com:8000/mqtt')
     setClient(mqttClient)
-    
-    // Clean up on unmount
+
     return () => {
       if (mqttClient) {
         mqttClient.end()
@@ -28,7 +27,6 @@ const TaskInput = () => {
       timestamp: new Date().toISOString()
     }
 
-    // Only publish if client is connected
     if (client.connected) {
       client.publish('/add', JSON.stringify(taskData))
       console.log('Task published:', taskData)

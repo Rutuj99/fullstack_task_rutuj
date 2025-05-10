@@ -44,7 +44,7 @@ function App() {
 
   const fetchTasks = async () => {
     try {
-      const response = await axios.get('http://localhost:3000/fetchAllTasks')
+      const response = await axios.get('https://fullstack-task-rutuj.onrender.com/fetchAllTasks')
       setTasks(response.data)
     } catch (error) {
       console.error('Error fetching tasks:', error)
